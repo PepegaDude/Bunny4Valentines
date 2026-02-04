@@ -3,27 +3,27 @@ import BunnyIllustration from "./BunnyIllustration";
 import HeartBurst from "./HeartBurst";
 import Confetti from "./Confetti";
 import FloatingHearts from "./FloatingHearts";
+import ourVideo from "@/assets/our-video.mp4";
 
 const sweetMessages = [
-  "Pretty please? 🥺",
-  "You're the sweetest person I know...",
-  "My heart beats for you 💕",
-  "I promise endless cuddles!",
-  "You make every day magical ✨",
-  "I'll love you forever and always...",
+  "I mean it 💕",
+  "You know you want to...",
+  "Just say yes already",
+  "Come on, make my day",
+  "I'll wait as long as it takes",
+  "But seriously though...",
 ];
 
 const poeticLines = [
-  "In a world full of fleeting moments,",
-  "you are my forever.",
-  "Every heartbeat whispers your name,",
-  "every dream is painted with your smile.",
+  "Every moment with you feels like home.",
+  "You make the ordinary feel extraordinary.",
+  "I can't imagine this day without you.",
 ];
 
 const ValentineProposal = () => {
   const [accepted, setAccepted] = useState(false);
   const [dodgeCount, setDodgeCount] = useState(0);
-  const [yesScale, setYesScale] = useState(1);
+  const [thinkingScale, setThinkingScale] = useState(1);
   const [currentMessage, setCurrentMessage] = useState(0);
   const [showBurst, setShowBurst] = useState(false);
   const thinkingBtnRef = useRef<HTMLButtonElement>(null);
@@ -39,33 +39,26 @@ const ValentineProposal = () => {
   const handleThinkingHover = () => {
     if (!thinkingBtnRef.current || !containerRef.current) return;
 
-    const container = containerRef.current.getBoundingClientRect();
     const btn = thinkingBtnRef.current;
     const btnRect = btn.getBoundingClientRect();
+    
+    // Constrained movement radius - max 80px in any direction
+    const maxOffset = 80;
+    const offsetX = (Math.random() - 0.5) * maxOffset * 2;
+    const offsetY = (Math.random() - 0.5) * maxOffset * 2;
 
-    // Calculate new random position within safe bounds
-    const maxX = container.width - btnRect.width - 40;
-    const maxY = container.height - btnRect.height - 40;
-
-    const newX = Math.max(20, Math.random() * maxX);
-    const newY = Math.max(20, Math.random() * maxY);
-
-    btn.style.position = 'absolute';
-    btn.style.left = `${newX}px`;
-    btn.style.top = `${newY}px`;
-    btn.style.transition = 'all 0.3s ease-out';
+    btn.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${Math.max(0.6, thinkingScale - 0.05)})`;
+    btn.style.transition = 'transform 0.25s ease-out';
 
     setDodgeCount(prev => prev + 1);
-    setYesScale(prev => Math.min(prev + 0.08, 1.6));
+    setThinkingScale(prev => Math.max(0.6, prev - 0.05));
     setCurrentMessage(prev => (prev + 1) % sweetMessages.length);
   };
 
   // Reset thinking button position on mount
   useEffect(() => {
     if (thinkingBtnRef.current) {
-      thinkingBtnRef.current.style.position = 'relative';
-      thinkingBtnRef.current.style.left = 'auto';
-      thinkingBtnRef.current.style.top = 'auto';
+      thinkingBtnRef.current.style.transform = 'translate(0, 0) scale(1)';
     }
   }, []);
 
@@ -75,24 +68,31 @@ const ValentineProposal = () => {
         <Confetti />
         <FloatingHearts />
         
-        <div className="text-center z-10 animate-fade-in-up">
-          <div className="text-6xl sm:text-8xl mb-8 animate-pulse-heart">💕</div>
+        <div className="text-center z-10 animate-fade-in-up w-full max-w-2xl">
+          <div className="text-5xl sm:text-6xl mb-6 animate-pulse-heart">💕</div>
           
-          <h1 className="font-script text-4xl sm:text-6xl md:text-7xl text-primary mb-6 leading-tight">
-            You just made my heart<br />the happiest!
+          <h1 className="font-script text-3xl sm:text-5xl md:text-6xl text-primary mb-4 leading-tight">
+            You just made my day
           </h1>
           
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-md mx-auto mb-8 opacity-0 animate-fade-in-up stagger-2">
-            Thank you for saying yes. This Valentine's Day and every day after, 
-            my heart belongs to you. ❤️
+          <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto mb-6 opacity-0 animate-fade-in-up stagger-2">
+            Here's to us ❤️
           </p>
           
-          <div className="opacity-0 animate-fade-in-up stagger-3">
-            <BunnyIllustration />
+          {/* Video */}
+          <div className="opacity-0 animate-fade-in-up stagger-3 rounded-2xl overflow-hidden shadow-romantic mx-auto max-w-md">
+            <video 
+              src={ourVideo} 
+              controls 
+              autoPlay 
+              loop
+              playsInline
+              className="w-full aspect-video object-cover"
+            />
           </div>
           
-          <p className="font-script text-2xl sm:text-3xl text-accent mt-8 opacity-0 animate-fade-in-up stagger-4">
-            Forever yours 💝
+          <p className="font-script text-xl sm:text-2xl text-accent mt-6 opacity-0 animate-fade-in-up stagger-4">
+            Happy Valentine's Day 💝
           </p>
         </div>
       </div>
@@ -144,10 +144,6 @@ const ValentineProposal = () => {
           <button
             onClick={handleYesClick}
             className="w-full max-w-xs py-4 px-8 bg-gradient-romantic text-white font-semibold text-xl rounded-full shadow-romantic hover:shadow-glow transition-all duration-300 transform hover:scale-105 active:scale-95"
-            style={{
-              transform: `scale(${yesScale})`,
-              transition: 'transform 0.3s ease-out',
-            }}
           >
             Yes! 💕
           </button>
@@ -157,7 +153,7 @@ const ValentineProposal = () => {
             ref={thinkingBtnRef}
             onMouseEnter={handleThinkingHover}
             onTouchStart={handleThinkingHover}
-            className="w-full max-w-xs py-4 px-8 bg-secondary text-secondary-foreground font-medium text-lg rounded-full border-2 border-primary/20 hover:border-primary/40 transition-all duration-300"
+            className="w-full max-w-xs py-3 px-6 bg-secondary text-secondary-foreground font-medium text-base rounded-full border-2 border-primary/20 hover:border-primary/40 transition-colors duration-300"
           >
             I'm thinking... 🤔
           </button>
